@@ -1,7 +1,7 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Pruner.Instrumenter" type="DotNetProject" factoryName=".NET Project">
     <option name="EXE_PATH" value="$PROJECT_DIR$/bin/Debug/net5.0/Pruner.Instrumenter.exe" />
-    <option name="PROGRAM_PARAMETERS" value="7f05d9e4-9a09-44ed-800e-8327f6840227" />
+    <option name="PROGRAM_PARAMETERS" value="7f05d9e4-9a09-44ed-800e-8327f6840227 Collect" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../sample" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
