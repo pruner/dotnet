@@ -25,4 +25,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          name: ${{ github.ref }}
           files: src/publish/Pruner.Instrumenter.exe
