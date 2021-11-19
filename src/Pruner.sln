@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pruner.Instrumenter", "Pruner.Instrumenter.csproj", "{AFB674A2-8DE1-4D5C-A882-9745E24896CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pruner.Instrumenter", "Pruner.Instrumenter/Pruner.Instrumenter.csproj", "{AFB674A2-8DE1-4D5C-A882-9745E24896CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
