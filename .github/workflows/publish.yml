@@ -21,8 +21,12 @@ jobs:
       - name: Publish
         working-directory: src
         run: dotnet publish -c Release -o publish
-        
-      - name: Release
-        uses: softprops/action-gh-release@v1
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
         with:
-          files: src/publish/Pruner.Instrumenter.exe
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          draft: false
+          artifacts: "src/publish/Pruner.Instrumenter.exe"
