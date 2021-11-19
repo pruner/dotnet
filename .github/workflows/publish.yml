@@ -19,9 +19,10 @@ jobs:
           include-prerelease: false
           
       - name: Publish
-        run: dotnet publish -c Release -o ${{ env.GITHUB_WORKSPACE }}/publish
+        working-directory: src
+        run: dotnet publish -c Release -o publish
         
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ env.GITHUB_WORKSPACE }}/publish/Pruner.Instrumenter.exe
+          files: src/publish/Pruner.Instrumenter.exe
