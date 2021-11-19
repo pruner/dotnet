@@ -19,6 +19,7 @@ jobs:
           include-prerelease: false
           
       - name: Publish
+        working-directory: /src/Pruner
         run: dotnet publish -c Release -o ${{ env.GITHUB_WORKSPACE }}/publish
         
       - name: Release
