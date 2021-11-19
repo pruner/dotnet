@@ -43,7 +43,7 @@ namespace Pruner.Instrumenter.Handlers
                 },
                 workingDirectory);
             if (assemblies.Length == 0)
-                throw new ValidationException("No assemblies found");
+                throw new ValidationException($"No assemblies found from directory {workingDirectory.FullName}");
 
             var sourceFiles = GetFiles(
                 new[]
@@ -60,7 +60,7 @@ namespace Pruner.Instrumenter.Handlers
                 },
                 workingDirectory);
             if (sourceFiles.Length == 0)
-                throw new ValidationException("No source files found");
+                throw new ValidationException($"No source files found from directory {workingDirectory.FullName}");
 
             var testFiles = GetFiles(
                 new[]
