@@ -81,7 +81,7 @@ namespace Pruner.Instrumenter.Handlers
                 Assemblies = assemblies,
                 HitsPath = Path.Combine(
                     settingsDirectory.FullName,
-                    "hits.tmp"),
+                    "hits"),
                 Sources = sourceFiles,
                 Tests = testFiles,
                 Workdir = workingDirectory
