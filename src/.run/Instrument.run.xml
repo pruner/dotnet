@@ -1,17 +1,17 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Instrument" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/bin/Debug/net5.0/Pruner.Instrumenter.exe" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/Pruner.Instrumenter/bin/Debug/net6.0/win-x64/Pruner.Instrumenter.exe" />
     <option name="PROGRAM_PARAMETERS" value="7f05d9e4-9a09-44ed-800e-8327f6840227 Instrument" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../sample" />
+    <option name="WORKING_DIRECTORY" value="$USER_HOME$/sample" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="1" />
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />
     <option name="PROJECT_PATH" value="$PROJECT_DIR$/Pruner.Instrumenter.csproj" />
-    <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+    <option name="PROJECT_EXE_PATH_TRACKING" value="0" />
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
-    <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="0" />
-    <option name="PROJECT_KIND" value="DotNetCore" />
+    <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+    <option name="PROJECT_KIND" value="Unloaded" />
     <option name="PROJECT_TFM" value="net5.0" />
     <method v="2">
       <option name="Build" />
