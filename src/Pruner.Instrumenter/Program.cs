@@ -72,6 +72,8 @@ namespace Pruner.Instrumenter
                 dotnetSettings.WorkingDirectory));
 
             var handler = commandHandlers.Single(x => x.CanHandle(command));
+            Console.WriteLine($"Executing handler for command {command} in paths ({providerWorkingDirectoryPath}, {temporarySettingsDirectory}).");
+            
             await handler.HandleAsync(
                 providerWorkingDirectoryPath,
                 temporarySettingsDirectory);
