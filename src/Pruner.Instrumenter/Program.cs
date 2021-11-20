@@ -67,9 +67,7 @@ namespace Pruner.Instrumenter
             if (dotnetSettings == null)
                 throw new ValidationException($"The Pruner settings file did not contain a settings object for ID {settingsId}");
 
-            var providerWorkingDirectoryPath = fileSystem.DirectoryInfo.FromDirectoryName(Path.Combine(
-                Environment.CurrentDirectory,
-                dotnetSettings.WorkingDirectory));
+            var providerWorkingDirectoryPath = Environment.CurrentDirectory;
 
             var handler = commandHandlers.Single(x => x.CanHandle(command));
             Console.WriteLine($"Executing handler for command {command} in paths ({providerWorkingDirectoryPath}, {temporarySettingsDirectory}).");
