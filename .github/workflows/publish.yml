@@ -27,6 +27,6 @@ jobs:
         with:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
+          tag: tag-${{ github.ref }}
           draft: false
           artifacts: "src/publish/Pruner.Instrumenter.exe"
