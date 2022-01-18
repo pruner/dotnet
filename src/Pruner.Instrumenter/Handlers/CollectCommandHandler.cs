@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using MiniCover.Core.Hits;
 using MiniCover.Core.Model;
 using MiniCover.HitServices;
