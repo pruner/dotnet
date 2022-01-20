@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -54,6 +55,9 @@ finally
 {
     Console.ForegroundColor = initialColor;
 }
+
+if (Debugger.IsAttached)
+    Console.ReadLine();
 
 class PrunerSettings
 {
