@@ -29,4 +29,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: latest
           draft: false
-          artifacts: "src/publish/Pruner.Instrumenter.exe"
+          artifacts: 
+            "src/publish/Pruner.Instrumenter.exe,src/publish/Pruner.Instrumenter.pdb"
