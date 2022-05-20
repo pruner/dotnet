@@ -12,6 +12,7 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DebugSymbols>true</DebugSymbols>
+      <Optimize>false</Optimize>
     </PropertyGroup>
 
     <ItemGroup>
