@@ -40,6 +40,8 @@ try
     await program.RunAsync(
         settingsId,
         command);
+
+    Console.WriteLine("Done.");
 }
 catch (ValidationException ex)
 {

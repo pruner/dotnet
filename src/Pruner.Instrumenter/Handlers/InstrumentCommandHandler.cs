@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -76,6 +77,10 @@ namespace Pruner.Instrumenter.Handlers
                 },
                 workingDirectory);
 
+            DebugFileCollection("Assemblies", assemblies);
+            DebugFileCollection("Source files", sourceFiles);
+            DebugFileCollection("Test files", testFiles);
+
             var instrumentationContext = new FileBasedInstrumentationContext
             {
                 Assemblies = assemblies,
@@ -94,6 +99,15 @@ namespace Pruner.Instrumenter.Handlers
                         settingsDirectory.FullName,
                         "coverage.tmp")), 
                 result);
+        }
+        
+        private static void DebugFileCollection(string name, IEnumerable<IFileInfo> files)
+        {
+            Console.WriteLine($"{name}:");
+            foreach (var file in files)
+            {
+                Console.WriteLine($"  {file.FullName}");
+            }
         }
 
         private static IFileInfo[] GetFiles(
@@ -139,6 +153,8 @@ namespace Pruner.Instrumenter.Handlers
                 Path.GetDirectoryName(coverageFile.FullName) ??
                 throw new InvalidOperationException("Can't find directory name."));
             await File.WriteAllTextAsync(coverageFile.FullName, json);
+            
+            Console.WriteLine("Saved coverage file to: " + coverageFile.FullName);
         }
     }
 }

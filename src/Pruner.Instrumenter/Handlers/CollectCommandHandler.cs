@@ -29,6 +29,8 @@ namespace Pruner.Instrumenter.Handlers
             var state = new State();
             foreach (var sourceFile in sourceFiles)
             {
+                Console.WriteLine($"Collecting coverage for {sourceFile}");
+                
                 foreach (var sequence in sourceFile.Sequences)
                 {
                     var contexts = hitsInfo.GetHitContexts(sequence.HitId);
