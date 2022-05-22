@@ -18,7 +18,8 @@ try
     var serviceCollection = new ServiceCollection();
     serviceCollection.AddMiniCoverCore();
     serviceCollection.AddLogging(x => x
-        .AddConsole());
+        .AddJsonConsole()
+        .SetMinimumLevel(LogLevel.Trace));
 
     serviceCollection.AddTransient<IFileSystem, FileSystem>();
     serviceCollection.AddTransient<Instrumenter>();
