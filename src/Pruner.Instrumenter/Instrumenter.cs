@@ -6,6 +6,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Pruner.Instrumenter;
 using Pruner.Instrumenter.Handlers;
@@ -16,7 +17,8 @@ try
 {
     var serviceCollection = new ServiceCollection();
     serviceCollection.AddMiniCoverCore();
-    serviceCollection.AddLogging();
+    serviceCollection.AddLogging(x => x
+        .AddConsole());
 
     serviceCollection.AddTransient<IFileSystem, FileSystem>();
     serviceCollection.AddTransient<Instrumenter>();
