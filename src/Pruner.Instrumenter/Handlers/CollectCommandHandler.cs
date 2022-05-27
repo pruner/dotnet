@@ -67,10 +67,14 @@ namespace Pruner.Instrumenter.Handlers
                         fileCoverage.Path = sourceFile.Path;
 
                         testState.FileCoverage.Add(fileCoverage);
-                        
-                        foreach (var line in sequence.GetLines())
+
+                        var lineHitCount = context.GetHitCount(sequence.HitId);
+                        if (lineHitCount > 0)
                         {
-                            fileCoverage.LineCoverage.Add(line);
+                            foreach (var line in sequence.GetLines())
+                            {
+                                fileCoverage.LineCoverage.Add(line);
+                            }
                         }
                     }
                 }

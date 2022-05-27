@@ -59,9 +59,6 @@ finally
     Console.ForegroundColor = initialColor;
 }
 
-if (Debugger.IsAttached)
-    Console.ReadLine();
-
 namespace Pruner.Instrumenter
 {
     class PrunerSettings
