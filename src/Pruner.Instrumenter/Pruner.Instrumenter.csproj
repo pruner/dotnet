@@ -19,7 +19,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
       <PackageReference Include="MiniCover.Core" Version="3.4.7" />
-      <PackageReference Include="MiniCover.HitServices" Version="3.4.5" />
+      <PackageReference Include="MiniCover.HitServices" Version="3.4.7" />
       <PackageReference Include="System.IO.Abstractions" Version="17.0.15" />
     </ItemGroup>
 
