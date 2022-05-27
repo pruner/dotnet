@@ -29,7 +29,7 @@ namespace Pruner.Instrumenter.Handlers
             var state = new State();
             foreach (var sourceFile in sourceFiles)
             {
-                Console.WriteLine($"Collecting coverage for {sourceFile}");
+                Console.WriteLine($"Collecting coverage for {sourceFile.Path}");
                 
                 foreach (var sequence in sourceFile.Sequences)
                 {
