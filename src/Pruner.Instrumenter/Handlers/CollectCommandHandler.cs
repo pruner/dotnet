@@ -72,9 +72,9 @@ namespace Pruner.Instrumenter.Handlers
                         var lineHitCount = context.GetHitCount(sequence.HitId);
                         if (lineHitCount > 0)
                         {
-                            foreach (var line in sequence.GetLines())
+                            for (var lineIndex = Math.Max(0, sequence.StartLine - 1); lineIndex <= sequence.EndLine + 1; ++lineIndex)
                             {
-                                fileCoverage.LineCoverage.Add(line);
+                                fileCoverage.LineCoverage.Add(lineIndex);
                             }
                         }
                     }
