@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Pruner.Models
+namespace Pruner.Instrumenter.Models
 {
     internal class State
     {

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace Pruner.Models
+// ReSharper disable CollectionNeverQueried.Global
+
+namespace Pruner.Instrumenter.Models
 {
     internal class StateFileCoverage
     {
-        public string Path { get; set; }
+        public string Path { get; set; } = null!;
         public HashSet<long> LineCoverage { get; set; } = new();
     }
 }

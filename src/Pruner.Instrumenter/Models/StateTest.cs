@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Pruner.Models
+namespace Pruner.Instrumenter.Models
 {
     class StateTest
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public HashSet<StateFileCoverage> FileCoverage { get; set; } = new();
     }
 }

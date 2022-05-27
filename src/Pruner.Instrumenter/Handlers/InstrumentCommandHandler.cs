@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MiniCover.Core.Instrumentation;
 using MiniCover.Core.Model;
 using Newtonsoft.Json;
@@ -13,15 +14,18 @@ namespace Pruner.Instrumenter.Handlers
 {
     public class InstrumentCommandHandler : ICommandHandler
     {
-        private readonly IFileSystem fileSystem;
-        private readonly IInstrumenter instrumenter;
+        private readonly IFileSystem _fileSystem;
+        private readonly IInstrumenter _instrumenter;
+        private readonly ILogger<InstrumentCommandHandler> _logger;
 
         public InstrumentCommandHandler(
             IFileSystem fileSystem,
-            IInstrumenter instrumenter)
+            IInstrumenter instrumenter,
+            ILogger<InstrumentCommandHandler> logger)
         {
-            this.fileSystem = fileSystem;
-            this.instrumenter = instrumenter;
+            _fileSystem = fileSystem;
+            _instrumenter = instrumenter;
+            _logger = logger;
         }
         
         public bool CanHandle(Command command)
@@ -36,7 +40,7 @@ namespace Pruner.Instrumenter.Handlers
             var assemblies = GetFiles(
                 new[]
                 {
-                    "**/*.dll"
+                    ".pruner-bin/**/*.dll"
                 },
                 new[]
                 {
@@ -84,30 +88,34 @@ namespace Pruner.Instrumenter.Handlers
             var instrumentationContext = new FileBasedInstrumentationContext
             {
                 Assemblies = assemblies,
-                HitsPath = Path.Combine(
-                    settingsDirectory.FullName,
-                    "hits"),
+                HitsPath = EnsureHitsDirectoryPath(settingsDirectory),
                 Sources = sourceFiles,
                 Tests = testFiles,
                 Workdir = workingDirectory
             };
 
-            var result = instrumenter.Instrument(instrumentationContext);
+            var result = _instrumenter.Instrument(instrumentationContext);
             await SaveCoverageFileAsync(
-                fileSystem.FileInfo.FromFileName(
-                    Path.Combine(
-                        settingsDirectory.FullName,
-                        "coverage.tmp")), 
+                _fileSystem.FileInfo.FromFileName(
+                    DirectoryUtilities.GetCoverageJsonFilePathFromSettingsDirectory(settingsDirectory)), 
                 result);
         }
-        
-        private static void DebugFileCollection(string name, IEnumerable<IFileInfo> files)
+
+        private static string EnsureHitsDirectoryPath(IDirectoryInfo settingsDirectory)
         {
-            Console.WriteLine($"{name}:");
-            foreach (var file in files)
-            {
-                Console.WriteLine($"  {file.FullName}");
-            }
+            var hitsDirectoryPath = Path.Combine(
+                settingsDirectory.FullName,
+                "hits");
+            Directory.CreateDirectory(hitsDirectoryPath);
+            return hitsDirectoryPath;
+        }
+
+        private void DebugFileCollection(string name, IEnumerable<IFileInfo> files)
+        {
+            _logger.LogInformation(
+                "Files {FileHeader}: {Files}", 
+                name, 
+                string.Join(", ", files.Select(f => f.FullName)));
         }
 
         private static IFileInfo[] GetFiles(
@@ -141,7 +149,7 @@ namespace Pruner.Instrumenter.Handlers
                 .ToArray();
         }
 
-        private static async Task SaveCoverageFileAsync(IFileInfo coverageFile, InstrumentationResult result)
+        private async Task SaveCoverageFileAsync(IFileInfo coverageFile, InstrumentationResult result)
         {
             var settings = new JsonSerializerSettings
             {
@@ -154,7 +162,7 @@ namespace Pruner.Instrumenter.Handlers
                 throw new InvalidOperationException("Can't find directory name."));
             await File.WriteAllTextAsync(coverageFile.FullName, json);
             
-            Console.WriteLine("Saved coverage file to: " + coverageFile.FullName);
+            _logger.LogInformation("Saved coverage file to: {CoverageFilePath}", coverageFile.FullName);
         }
     }
 }

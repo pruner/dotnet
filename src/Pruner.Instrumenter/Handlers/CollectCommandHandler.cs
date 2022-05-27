@@ -4,16 +4,29 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MiniCover.Core.Hits;
 using MiniCover.Core.Model;
 using MiniCover.HitServices;
 using Newtonsoft.Json;
-using Pruner.Models;
+using Newtonsoft.Json.Serialization;
+using Pruner.Instrumenter.Models;
 
 namespace Pruner.Instrumenter.Handlers
 {
     public class CollectCommandHandler : ICommandHandler
     {
+        private readonly ILogger<CollectCommandHandler> _logger;
+        private readonly IHitsReader _hitsReader;
+
+        public CollectCommandHandler(
+            ILogger<CollectCommandHandler> logger,
+            IHitsReader hitsReader)
+        {
+            _logger = logger;
+            _hitsReader = hitsReader;
+        }
+        
         public bool CanHandle(Command command)
         {
             return command == Command.Collect;
@@ -23,13 +36,16 @@ namespace Pruner.Instrumenter.Handlers
             IDirectoryInfo workingDirectory,
             IDirectoryInfo settingsDirectory)
         {
-            var hitsInfo = GetHitsInfo(settingsDirectory);
+            _logger.LogInformation("Collecting coverage");
+            
+            var hitsInfo = _hitsReader.TryReadFromDirectory(
+                Path.Combine(settingsDirectory.FullName, "hits"));
             var sourceFiles = GetSourceFiles(settingsDirectory);
 
             var state = new State();
             foreach (var sourceFile in sourceFiles)
             {
-                Console.WriteLine($"Collecting coverage for {sourceFile.Path}");
+                _logger.LogInformation("Collecting coverage for {SourceFilePath}", sourceFile.Path);
                 
                 foreach (var sequence in sourceFile.Sequences)
                 {
@@ -64,41 +80,24 @@ namespace Pruner.Instrumenter.Handlers
                 Path.Combine(
                     settingsDirectory.FullName,
                     "state.json"),
-                JsonConvert.SerializeObject(state));
+                JsonConvert.SerializeObject(
+                    state,
+                    new JsonSerializerSettings()
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    }));
         }
 
         private static SourceFile[] GetSourceFiles(IDirectoryInfo settingsDirectory)
         {
             var instrumentationResult = JsonConvert.DeserializeObject<InstrumentationResult>(
                 File.ReadAllText(
-                    Path.Combine(
-                        settingsDirectory.FullName,
-                        "coverage.tmp")));
+                    DirectoryUtilities.GetCoverageJsonFilePathFromSettingsDirectory(settingsDirectory)));
             if (instrumentationResult == null)
                 throw new InvalidOperationException("Couldn't find instrumentation result.");
 
             var sourceFiles = instrumentationResult.GetSourceFiles();
             return sourceFiles;
-        }
-
-        private HitsInfo GetHitsInfo(
-            IDirectoryInfo settingsDirectory)
-        {
-            var contexts = new HashSet<HitContext>();
-            if (!settingsDirectory.Exists)
-                return new HitsInfo(contexts);
-
-            foreach (var hitFile in settingsDirectory.GetFiles("*.hits", SearchOption.AllDirectories))
-            {
-                using var fileStream = hitFile.Open(FileMode.Open, FileAccess.Read);
-                var hitContexts = HitContext.Deserialize(fileStream);
-                foreach (var hitContext in hitContexts)
-                {
-                    contexts.Add(hitContext);
-                }
-            }
-
-            return new HitsInfo(contexts);
         }
     }
 }

@@ -43,8 +43,6 @@ try
     await program.RunAsync(
         settingsId,
         command);
-
-    Console.WriteLine("Done.");
 }
 catch (ValidationException ex)
 {
@@ -64,67 +62,77 @@ finally
 if (Debugger.IsAttached)
     Console.ReadLine();
 
-class PrunerSettings
+namespace Pruner.Instrumenter
 {
-    public TestProvider[]? Providers { get; set; }
-}
-
-public class TestProvider
-{
-    public string WorkingDirectory { get; set; } = null!;
-    public string Id { get; set; } = null!;
-}
-
-public enum Command
-{
-    Instrument,
-    Collect
-}
-    
-class Instrumenter
-{
-    private readonly IFileSystem fileSystem;
-    private readonly IEnumerable<ICommandHandler> commandHandlers;
-
-    public Instrumenter(
-        IFileSystem fileSystem,
-        IEnumerable<ICommandHandler> commandHandlers)
+    class PrunerSettings
     {
-        this.fileSystem = fileSystem;
-        this.commandHandlers = commandHandlers;
+        public TestProvider[]? Providers { get; set; }
     }
 
-    public async Task RunAsync(
-        string settingsId,
-        Command command)
+    public class TestProvider
     {
-        if (string.IsNullOrWhiteSpace(settingsId))
-            throw new ValidationException("Settings ID not specified.");
+        public string WorkingDirectory { get; set; } = null!;
+        public string Id { get; set; } = null!;
+    }
 
-        var prunerPath = Path.Combine(
-            Environment.CurrentDirectory,
-            ".pruner");
-        var temporarySettingsDirectory = fileSystem.DirectoryInfo.FromDirectoryName(
-            Path.Combine(
+    public enum Command
+    {
+        Instrument,
+        Collect
+    }
+    
+    class Instrumenter
+    {
+        private readonly IFileSystem _fileSystem;
+        private readonly IEnumerable<ICommandHandler> _commandHandlers;
+        private readonly ILogger<Instrumenter> _logger;
+
+        public Instrumenter(
+            IFileSystem fileSystem,
+            IEnumerable<ICommandHandler> commandHandlers,
+            ILogger<Instrumenter> logger)
+        {
+            _fileSystem = fileSystem;
+            _commandHandlers = commandHandlers;
+            _logger = logger;
+        }
+
+        public async Task RunAsync(
+            string settingsId,
+            Command command)
+        {
+            if (string.IsNullOrWhiteSpace(settingsId))
+                throw new ValidationException("Settings ID not specified.");
+
+            var prunerPath = Path.Combine(
+                Environment.CurrentDirectory,
+                ".pruner");
+            var temporarySettingsDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(
+                Path.Combine(
+                    prunerPath,
+                    "temp",
+                    settingsId));
+
+            var settingsContents = await File.ReadAllTextAsync(Path.Combine(
                 prunerPath,
-                "temp",
-                settingsId));
+                "settings.json"));
+            var settings = JsonConvert.DeserializeObject<PrunerSettings>(settingsContents);
+            var dotnetSettings = settings?.Providers?.SingleOrDefault(x => x.Id == settingsId);
+            if (dotnetSettings == null)
+                throw new ValidationException($"The Pruner settings file did not contain a settings object for ID {settingsId}");
 
-        var settingsContents = await File.ReadAllTextAsync(Path.Combine(
-            prunerPath,
-            "settings.json"));
-        var settings = JsonConvert.DeserializeObject<PrunerSettings>(settingsContents);
-        var dotnetSettings = settings?.Providers?.SingleOrDefault(x => x.Id == settingsId);
-        if (dotnetSettings == null)
-            throw new ValidationException($"The Pruner settings file did not contain a settings object for ID {settingsId}");
+            var providerWorkingDirectoryPath = _fileSystem.DirectoryInfo.FromDirectoryName(Environment.CurrentDirectory);
 
-        var providerWorkingDirectoryPath = fileSystem.DirectoryInfo.FromDirectoryName(Environment.CurrentDirectory);
-
-        var handler = commandHandlers.Single(x => x.CanHandle(command));
-        Console.WriteLine($"Executing handler for command {command} in paths ({providerWorkingDirectoryPath}, {temporarySettingsDirectory}).");
+            var handler = _commandHandlers.Single(x => x.CanHandle(command));
+            _logger.LogInformation(
+                "Executing handler for command {Command} in paths ({ProviderWorkingDirectoryPath}, {TemporarySettingsDirectory})",
+                command,
+                providerWorkingDirectoryPath,
+                temporarySettingsDirectory);
             
-        await handler.HandleAsync(
-            providerWorkingDirectoryPath,
-            temporarySettingsDirectory);
+            await handler.HandleAsync(
+                providerWorkingDirectoryPath,
+                temporarySettingsDirectory);
+        }
     }
 }
