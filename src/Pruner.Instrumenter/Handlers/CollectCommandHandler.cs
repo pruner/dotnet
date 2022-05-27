@@ -61,10 +61,11 @@ namespace Pruner.Instrumenter.Handlers
                         
                         state.Tests.Add(testState);
 
+                        var sanitizedFilePath = SanitizeFilePath(sourceFile);
                         var fileCoverage =
-                            testState.FileCoverage.SingleOrDefault(x => x.Path == sourceFile.Path) ??
+                            testState.FileCoverage.SingleOrDefault(x => x.Path == sanitizedFilePath) ??
                             new StateFileCoverage();
-                        fileCoverage.Path = sourceFile.Path.Replace("\\", "/");
+                        fileCoverage.Path = sanitizedFilePath;
 
                         testState.FileCoverage.Add(fileCoverage);
 
@@ -90,6 +91,11 @@ namespace Pruner.Instrumenter.Handlers
                     {
                         ContractResolver = new CamelCasePropertyNamesContractResolver()
                     }));
+        }
+
+        private static string SanitizeFilePath(SourceFile sourceFile)
+        {
+            return sourceFile.Path.Replace("\\", "/");
         }
 
         private static SourceFile[] GetSourceFiles(IDirectoryInfo settingsDirectory)
