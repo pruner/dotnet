@@ -34,4 +34,4 @@ jobs:
           tag: latest
           draft: false
           artifacts:
-            "src/publish/Pruner.Instrumenter.zip"
+            "Pruner.Instrumenter.zip"
