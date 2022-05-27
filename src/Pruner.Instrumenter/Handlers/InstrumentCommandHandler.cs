@@ -88,7 +88,7 @@ namespace Pruner.Instrumenter.Handlers
             var instrumentationContext = new FileBasedInstrumentationContext
             {
                 Assemblies = assemblies,
-                HitsPath = EnsureHitsDirectoryPath(settingsDirectory),
+                HitsPath = EnsureCleanHitsDirectoryPath(settingsDirectory),
                 Sources = sourceFiles,
                 Tests = testFiles,
                 Workdir = workingDirectory
@@ -101,12 +101,19 @@ namespace Pruner.Instrumenter.Handlers
                 result);
         }
 
-        private static string EnsureHitsDirectoryPath(IDirectoryInfo settingsDirectory)
+        private static string EnsureCleanHitsDirectoryPath(IDirectoryInfo settingsDirectory)
         {
             var hitsDirectoryPath = Path.Combine(
                 settingsDirectory.FullName,
                 "hits");
+            
+            if (Directory.Exists(hitsDirectoryPath))
+            {
+                Directory.Delete(hitsDirectoryPath, true);
+            }
+            
             Directory.CreateDirectory(hitsDirectoryPath);
+            
             return hitsDirectoryPath;
         }
 
