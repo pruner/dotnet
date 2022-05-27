@@ -64,7 +64,7 @@ namespace Pruner.Instrumenter.Handlers
                         var fileCoverage =
                             testState.FileCoverage.SingleOrDefault(x => x.Path == sourceFile.Path) ??
                             new StateFileCoverage();
-                        fileCoverage.Path = sourceFile.Path;
+                        fileCoverage.Path = sourceFile.Path.Replace("\\", "/");
 
                         testState.FileCoverage.Add(fileCoverage);
 
