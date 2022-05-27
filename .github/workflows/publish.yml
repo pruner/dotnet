@@ -26,12 +26,12 @@ jobs:
         with:
           args: zip -qq -r Pruner.Instrumenter.zip publish
 
-        - name: Create release
-          uses: ncipollo/release-action@v1
-          with:
-            allowUpdates: true
-            token: ${{ secrets.GITHUB_TOKEN }}
-            tag: latest
-            draft: false
-            artifacts:
-              "src/publish/Pruner.Instrumenter.zip"
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: latest
+          draft: false
+          artifacts:
+            "src/publish/Pruner.Instrumenter.zip"
