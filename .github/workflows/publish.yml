@@ -17,17 +17,21 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: false
-          
+
       - name: Publish
         working-directory: src
         run: dotnet publish -c Release -o publish
 
-      - name: Create release
-        uses: ncipollo/release-action@v1
+      - uses: montudor/action-zip@v1
         with:
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: latest
-          draft: false
-          artifacts: 
-            "src/publish/Pruner.Instrumenter.exe,src/publish/Pruner.Instrumenter.pdb"
+          args: zip -qq -r Pruner.Instrumenter.zip publish
+
+        - name: Create release
+          uses: ncipollo/release-action@v1
+          with:
+            allowUpdates: true
+            token: ${{ secrets.GITHUB_TOKEN }}
+            tag: latest
+            draft: false
+            artifacts:
+              "src/publish/Pruner.Instrumenter.zip"
