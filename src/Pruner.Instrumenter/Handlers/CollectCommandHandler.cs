@@ -121,8 +121,8 @@ namespace Pruner.Instrumenter.Handlers
 
         private static void AddSequenceLinesToCoverage(InstrumentedSequence sequence, StateFileCoverage fileCoverage)
         {
-            for (var lineIndex = Math.Max(0, sequence.StartLine - 1);
-                 lineIndex <= sequence.EndLine + 1;
+            for (var lineIndex = sequence.StartLine;
+                 lineIndex <= sequence.EndLine;
                  ++lineIndex)
             {
                 fileCoverage.LineCoverage.Add(lineIndex);
