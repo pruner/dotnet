@@ -34,9 +34,10 @@ namespace Pruner.Instrumenter.Handlers
         }
 
         public async Task HandleAsync(
-            IDirectoryInfo workingDirectory,
+            TestProvider provider,
             IDirectoryInfo settingsDirectory)
         {
+            var workingDirectory = _fileSystem.GetWorkingDirectory();
             var assemblies = GetFiles(
                 new[]
                 {

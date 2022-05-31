@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Abstractions;
 
 namespace Pruner.Instrumenter.Handlers;
@@ -10,5 +11,10 @@ public static class DirectoryUtilities
         return Path.Combine(
             settingsDirectory.FullName,
             "coverage.json");
+    }
+
+    public static IDirectoryInfo GetWorkingDirectory(this IFileSystem fileSystem)
+    {
+        return fileSystem.DirectoryInfo.FromDirectoryName(Environment.CurrentDirectory);
     }
 }

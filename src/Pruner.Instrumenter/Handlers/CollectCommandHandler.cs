@@ -33,54 +33,12 @@ namespace Pruner.Instrumenter.Handlers
         }
 
         public async Task HandleAsync(
-            IDirectoryInfo workingDirectory,
+            TestProvider provider,
             IDirectoryInfo settingsDirectory)
         {
             _logger.LogInformation("Collecting coverage");
             
-            var hitsInfo = _hitsReader.TryReadFromDirectory(
-                Path.Combine(settingsDirectory.FullName, "hits"));
-            var sourceFiles = GetSourceFiles(settingsDirectory);
-
-            var state = new State();
-            foreach (var sourceFile in sourceFiles)
-            {
-                _logger.LogInformation("Collecting coverage for {SourceFilePath}", sourceFile.Path);
-                
-                foreach (var sequence in sourceFile.Sequences)
-                {
-                    var contexts = hitsInfo.GetHitContexts(sequence.HitId);
-                    foreach (var context in contexts)
-                    {
-                        var contextName = $"{context.ClassName}.{context.MethodName}";
-
-                        var testState = 
-                            state.Tests.SingleOrDefault(x => x.Name == contextName) ??
-                            new StateTest();
-                        testState.Name = contextName;
-                        
-                        state.Tests.Add(testState);
-
-                        var sanitizedFilePath = SanitizeFilePath(sourceFile);
-                        var fileCoverage =
-                            testState.FileCoverage.SingleOrDefault(x => x.Path == sanitizedFilePath) ??
-                            new StateFileCoverage();
-                        fileCoverage.Path = sanitizedFilePath;
-
-                        testState.FileCoverage.Add(fileCoverage);
-
-                        var lineHitCount = context.GetHitCount(sequence.HitId);
-                        if (lineHitCount > 0)
-                        {
-                            for (var lineIndex = Math.Max(0, sequence.StartLine - 1); lineIndex <= sequence.EndLine + 1; ++lineIndex)
-                            {
-                                fileCoverage.LineCoverage.Add(lineIndex);
-                            }
-                        }
-                    }
-                }
-            }
-
+            var state = GatherStateFromCoverage(provider, settingsDirectory);
             await File.WriteAllTextAsync(
                 Path.Combine(
                     settingsDirectory.FullName,
@@ -93,9 +51,87 @@ namespace Pruner.Instrumenter.Handlers
                     }));
         }
 
-        private static string SanitizeFilePath(SourceFile sourceFile)
+        private State GatherStateFromCoverage(
+            TestProvider provider,
+            IDirectoryInfo settingsDirectory)
         {
-            return sourceFile.Path.Replace("\\", "/");
+            var hitsInfo = _hitsReader.TryReadFromDirectory(
+                Path.Combine(settingsDirectory.FullName, "hits"));
+            var sourceFiles = GetSourceFiles(settingsDirectory);
+
+            var state = new State();
+            foreach (var sourceFile in sourceFiles)
+            {
+                _logger.LogInformation("Collecting coverage for {SourceFilePath}", sourceFile.Path);
+
+                foreach (var sequence in sourceFile.Sequences)
+                {
+                    var contexts = hitsInfo.GetHitContexts(sequence.HitId);
+                    foreach (var context in contexts)
+                    {
+                        var testState = AddOrUpdateTestCoverage(context, state);
+
+                        var fileCoverage = AddOrUpdateFileCoverage(
+                            provider,
+                            testState, 
+                            sourceFile);
+
+                        var lineHitCount = context.GetHitCount(sequence.HitId);
+                        if (lineHitCount > 0)
+                        {
+                            AddSequenceLinesToCoverage(
+                                sequence, 
+                                fileCoverage);
+                        }
+                    }
+                }
+            }
+
+            return state;
+        }
+
+        private static StateTest AddOrUpdateTestCoverage(HitContext context, State state)
+        {
+            var contextName = $"{context.ClassName}.{context.MethodName}";
+
+            var testState =
+                state.Tests.SingleOrDefault(x => x.Name == contextName) ??
+                new StateTest();
+            testState.Name = contextName;
+
+            state.Tests.Add(testState);
+            return testState;
+        }
+
+        private static StateFileCoverage AddOrUpdateFileCoverage(TestProvider provider, StateTest testState,
+            SourceFile sourceFile)
+        {
+            var sanitizedFilePath = SanitizeFilePath(
+                Path.Combine(
+                    provider.WorkingDirectory,
+                    sourceFile.Path));
+            var fileCoverage =
+                testState.FileCoverage.SingleOrDefault(x => x.Path == sanitizedFilePath) ??
+                new StateFileCoverage();
+            fileCoverage.Path = sanitizedFilePath;
+
+            testState.FileCoverage.Add(fileCoverage);
+            return fileCoverage;
+        }
+
+        private static void AddSequenceLinesToCoverage(InstrumentedSequence sequence, StateFileCoverage fileCoverage)
+        {
+            for (var lineIndex = Math.Max(0, sequence.StartLine - 1);
+                 lineIndex <= sequence.EndLine + 1;
+                 ++lineIndex)
+            {
+                fileCoverage.LineCoverage.Add(lineIndex);
+            }
+        }
+
+        private static string SanitizeFilePath(string path)
+        {
+            return path.Replace("\\", "/");
         }
 
         private static SourceFile[] GetSourceFiles(IDirectoryInfo settingsDirectory)

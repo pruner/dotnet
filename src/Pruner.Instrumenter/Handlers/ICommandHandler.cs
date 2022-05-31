@@ -8,7 +8,7 @@ namespace Pruner.Instrumenter.Handlers
         bool CanHandle(Command command);
 
         Task HandleAsync(
-            IDirectoryInfo workingDirectory,
+            TestProvider provider,
             IDirectoryInfo settingsDirectory);
     }
 }

@@ -114,21 +114,19 @@ namespace Pruner.Instrumenter
                 prunerPath,
                 "settings.json"));
             var settings = JsonConvert.DeserializeObject<PrunerSettings>(settingsContents);
+            
             var dotnetSettings = settings?.Providers?.SingleOrDefault(x => x.Id == settingsId);
             if (dotnetSettings == null)
                 throw new ValidationException($"The Pruner settings file did not contain a settings object for ID {settingsId}");
 
-            var providerWorkingDirectoryPath = _fileSystem.DirectoryInfo.FromDirectoryName(Environment.CurrentDirectory);
-
             var handler = _commandHandlers.Single(x => x.CanHandle(command));
             _logger.LogInformation(
-                "Executing handler for command {Command} in paths ({ProviderWorkingDirectoryPath}, {TemporarySettingsDirectory})",
+                "Executing handler for command {Command} with settings path {TemporarySettingsDirectory}",
                 command,
-                providerWorkingDirectoryPath,
                 temporarySettingsDirectory);
             
             await handler.HandleAsync(
-                providerWorkingDirectoryPath,
+                dotnetSettings,
                 temporarySettingsDirectory);
         }
     }
