@@ -59,10 +59,7 @@ namespace Pruner.Instrumenter.Handlers
                 new[]
                 {
                     "**/bin/**/*.cs",
-                    "**/obj/**/*.cs",
-                    "tests/**/*.cs",
-                    "test/**/*.cs",
-                    "**/*.Tests/**/*.cs"
+                    "**/obj/**/*.cs"
                 },
                 workingDirectory);
             if (sourceFiles.Length == 0)
